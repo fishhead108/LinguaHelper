@@ -1,0 +1,2 @@
+mail = '2543810@gmail.com'
+passwd = 'aC1IHR'

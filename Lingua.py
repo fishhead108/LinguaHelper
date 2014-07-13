@@ -3,8 +3,8 @@ import urllib2
 import requests
 
 word = 'help'
-mail = '2543810@gmail.com'
-passwd = 'aC1IHR'
+mail = ''
+passwd = ''
 
 link = 'http://api.lingualeo.com/gettranslates?word=' + word
 
