@@ -54,8 +54,9 @@ def login(email, password):
     return cookie
 
 def main():
-    cookie = login(mail, passwd)
-    print cookie
+
+# cookie = login(mail, passwd)
+#print cookie
     #print create_cookie(cookie)
     #cookie = {'servid':'f3a14c0aa1828146590a5c0e5bcefe1a7741d68d51c12d25e6ba40da7918893ed2d7963628da7252',"userid" : "3299", "AWSELB" : "75C701150A9420ACA77B49A59BB2636792D3E5911E677A65153DA70A80FDAAD4FB2493A73BAFD8779ADEAAAC382AFA7952EDE5B45F6C8A9C148E59341A1745F2BD0BEABDA2917467E67EE73E125B9EDCB7159DE56D","remember" : "e30c0000af17f67875ab20ad59d1ed6aa5c8161a4876d31e25ee67f1996883d45e06b1058abdfa0d"}
     #print requests.get(url='http://api.lingualeo.com/gettranslates?word=help',cookies=cookie).text
