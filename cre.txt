@@ -1,2 +1,0 @@
-email = '2543810@gmail.com'
-passwd = 'aC1IH'

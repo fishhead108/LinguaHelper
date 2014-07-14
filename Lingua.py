@@ -2,20 +2,17 @@ __author__ = 'fish'
 # -*- coding: utf-8 -*-
 import requests
 import sys
-
 reload(sys)
 sys.setdefaultencoding("utf8")
+
+# Variables
 mail = raw_input('Введите ваш email:\n')
 passwd = raw_input('Введите ваш пароль:\n')
 filename = raw_input('Введите название файла для выгрузки в Anki:\n')
-
 r = ''
 cookie = {}
 w = ''
-words = (
-'absence', 'account', 'actuality', 'adjustment', 'administer', 'adversary', 'advertisement', 'agreement', 'amusement',
-'apparatus')
-
+words = ()
 
 def download_file(file):
     r = requests.get(file)
@@ -24,7 +21,7 @@ def download_file(file):
 
 def make_word(so):
     global w
-    word = ((so).split(',')[3]).split('"')[3]
+    #word = ((so).split(',')[3]).split('"')[3]
     transcription = (((so).split(',')[-4]).split(':')[1]).encode('utf-8')
     translation = ((so).split(',')[7]).split(":")[1]
     picture = ((((so).encode('ascii', 'replace')).split(',')[5]).split('"')[3]).replace('\\', '')
@@ -63,17 +60,23 @@ def ask_leo(word):
     return make_word(hit.text)
 
 
+def create_wordslist():
+    global words
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\test.txt') as list:
+        words = (list.read()).split('\n')
+    return
+
 def instruction():
     print (
     'Чтобы произвести импорт карточек в Anki:\n1) Запустите Anki.\n2) В меню выберите Файл-Импортировать.\n3) В меню выберите файл который вы сохранили вначале.')
 
-
 def main():
     login(mail, passwd)
+    create_wordslist()
     for word in words:
+        print word
         ask_leo(word)
     instruction()
-
 
 if __name__ == '__main__':
     main()
