@@ -5,8 +5,10 @@ import sys
 
 reload(sys)
 sys.setdefaultencoding("utf8")
-mail = '2543810@gmail.com'
-passwd = 'aC1IHR'
+mail = raw_input('Введите ваш email:\n')
+passwd = raw_input('Введите ваш пароль:\n')
+filename = raw_input('Введите название файла для выгрузки в Anki:\n')
+
 r = ''
 cookie = {}
 w = ''
@@ -15,14 +17,10 @@ words = (
 'apparatus')
 
 
-def download_file():
-    with open('/Users/fish/' + word + '.jpg', 'wb') as handle:
-        response = requests.get(picture, stream=True)
-        for block in response.iter_content(1024):
-            if not block:
-                break
-            handle.write(block)
-
+def download_file(file):
+    r = requests.get(file)
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\collection.media\\' + file.split('/')[-1], "wb") as code:
+        code.write(r.content)
 
 def make_word(so):
     global w
@@ -31,12 +29,13 @@ def make_word(so):
     translation = ((so).split(',')[7]).split(":")[1]
     picture = ((((so).encode('ascii', 'replace')).split(',')[5]).split('"')[3]).replace('\\', '')
     sound = ((((so).encode('ascii', 'replace')).split(',')[-1]).split('"')[3]).replace('\\', '')
+    download_file(sound)
+    download_file(picture)
     return save_files(w, (transcription).split('"')[1], (translation).split('"')[1], (picture).split('/')[-1],
                       (sound).split('/')[-1])
 
-
 def save_files(word, transcription, translation, picture, sound):
-    with open('test1.txt', 'a') as handle:
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\' + filename + '.txt', 'a') as handle:
         handle.write(
             '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']')
 
@@ -52,7 +51,6 @@ def login(email, password):
               "remember": "e30c0000af17f67875ab20ad59d1ed6aa5c8161a4876d31e25ee67f1996883d45e06b1058abdfa0d"}
     return
 
-
 def ask_leo(word):
     """
 
@@ -64,10 +62,18 @@ def ask_leo(word):
     w = word
     return make_word(hit.text)
 
+
+def instruction():
+    print (
+    'Чтобы произвести импорт карточек в Anki:\n1) Запустите Anki.\n2) В меню выберите Файл-Импортировать.\n3) В меню выберите файл который вы сохранили вначале.')
+
+
 def main():
     login(mail, passwd)
     for word in words:
         ask_leo(word)
+    instruction()
+
 
 if __name__ == '__main__':
     main()
