@@ -26,6 +26,10 @@ def save_file():
                 break
             handle.write(block)
 
+    r = requests.get(picture)
+    with open("picture.jpg", "wb") as code:
+    code.write(r.content)
+
 def get_sound(word):
     url = "http://translate.google.com/translate_tts?tl=en&q=" + word
     request = urllib2.Request(url)
