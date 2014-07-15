@@ -31,8 +31,8 @@ def make_word(so):
     sound = ((((so).encode('ascii', 'replace')).split(',')[-1]).split('"')[3]).replace('\\', '')
     download_file(sound)
     download_file(picture)
-    return save_files(w, (transcription).split('"')[1], (translation).split('"')[1], (picture).split('/')[-1],
-                      (sound).split('/')[-1])
+    return save_files(w, transcription.split('"')[1], translation.split('"')[1], picture.split('/')[-1],
+                      sound.split('/')[-1])
 
 
 def save_files(word, transcription, translation, picture, sound):
@@ -56,7 +56,6 @@ def login(email, password):
 
 def ask_leo(word):
     """
-
     Делаем запрос в ЛингваЛео по заданому слову и возвращаем его значение в функцию make_word
     """
     global w
@@ -67,9 +66,12 @@ def ask_leo(word):
 
 
 def create_wordslist():
+    """
+    Open file and read them into list.
+    """
     global words
-    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\test.txt') as list:
-        words = (list.read()).split('\n')
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\test.txt') as f:
+        words = (f.read()).split('\n')
     return
 
 
@@ -79,6 +81,9 @@ def instruction():
 
 
 def main():
+    """
+    Main entry point for script.
+    """
     login(mail, passwd)
     create_wordslist()
     for word in words:
@@ -88,4 +93,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
