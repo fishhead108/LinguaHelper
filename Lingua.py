@@ -7,22 +7,57 @@ reload(sys)
 sys.setdefaultencoding("utf8")
 
 # Variables
-mail = raw_input('Введите ваш email:\n')
-passwd = raw_input('Введите ваш пароль:\n')
-filename = raw_input('Введите название файла для выгрузки в Anki:\n')
-r = ''
-cookie = {}
-w = ''
-words = ()
+class Variables():
+    def __init__(self):
+        self.mail = raw_input('Введите ваш email:\n')
+        self.passwd = raw_input('Введите ваш пароль:\n')
+        self.filename = raw_input('Введите название файла для выгрузки в Anki:\n')
+        self.r = ''
+        self.cookie = {}
+        self.w = ''
+        self.words = ()
 
 
-def download_file(file):
-    r = requests.get(file)
-    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\collection.media\\' + file.split('/')[-1], "wb") as code:
-        code.write(r.content)
+def create_wordslist():
+    """
+    Open file with words and read them into list.
+    """
+    global words
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\test.txt') as f:
+        words = (f.read()).split('\n')
+    return
+
+
+def login(email, password):
+    """
+    Login to LinguaLeo.
+    """
+    global r
+    global cookie
+    url = 'http://lingualeo.ru/ru/login'
+    data = {'email': email, 'password': password}
+    r = requests.post(url=url, data=data)
+    cookie = {'servid': (r.cookies.extract_cookies.im_self.get('servid')),
+              "userid": "3299",
+              "AWSELB": (r.cookies.extract_cookies.im_self.get('AWSELB')),
+              "remember": "e30c0000af17f67875ab20ad59d1ed6aa5c8161a4876d31e25ee67f1996883d45e06b1058abdfa0d"}
+
+
+def ask_leo(word):
+    """
+    Do the query to LinguaLeo with chosen word and return value to function make_word.
+    """
+    global w
+    link = 'http://api.lingualeo.com/gettranslates?word=' + word
+    hit = requests.get(url=link, cookies=cookie)
+    w = word
+    return make_word(hit.text)
 
 
 def make_word(so):
+    """
+    Getting definitions of the word.
+    """
     global w
     # word = ((so).split(',')[3]).split('"')[3]
     transcription = (((so).split(',')[-4]).split(':')[1]).encode('utf-8')
@@ -35,54 +70,37 @@ def make_word(so):
                       sound.split('/')[-1])
 
 
+def download_file(file):
+    """
+    Downloading image and audio files.
+    """
+    r = requests.get(file)
+    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\collection.media\\' + file.split('/')[-1], "wb") as code:
+        code.write(r.content)
+
+
 def save_files(word, transcription, translation, picture, sound):
+    """
+    Saving values into file for next import to Anki.
+    """
     with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\' + filename + '.txt', 'a') as handle:
         handle.write(
             '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']')
 
 
-def login(email, password):
-    global r
-    global cookie
-    url = 'http://lingualeo.ru/ru/login'
-    data = {'email': email, 'password': password}
-    r = requests.post(url=url, data=data)
-    cookie = {'servid': (r.cookies.extract_cookies.im_self.get('servid')),
-              "userid": "3299",
-              "AWSELB": (r.cookies.extract_cookies.im_self.get('AWSELB')),
-              "remember": "e30c0000af17f67875ab20ad59d1ed6aa5c8161a4876d31e25ee67f1996883d45e06b1058abdfa0d"}
-    return
-
-
-def ask_leo(word):
-    """
-    Делаем запрос в ЛингваЛео по заданому слову и возвращаем его значение в функцию make_word
-    """
-    global w
-    link = 'http://api.lingualeo.com/gettranslates?word=' + word
-    hit = requests.get(url=link, cookies=cookie)
-    w = word
-    return make_word(hit.text)
-
-
-def create_wordslist():
-    """
-    Open file and read them into list.
-    """
-    global words
-    with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\test.txt') as f:
-        words = (f.read()).split('\n')
-    return
-
-
 def instruction():
-    print (
-        'Чтобы произвести импорт карточек в Anki:\n1) Запустите Anki.\n2) В меню выберите Файл-Импортировать.\n3) В меню выберите файл который вы сохранили вначале.')
+    """
+    Writes instruction after installation.
+    """
+    print ('Чтобы произвести импорт карточек в Anki:\n'
+           '1) Запустите Anki.\n'
+           '2) В меню выберите Файл-Импортировать.\n'
+           '3) В меню выберите файл который вы сохранили вначале.')
 
 
 def main():
     """
-    Main entry point for script.
+    Main entry point for the script.
     """
     login(mail, passwd)
     create_wordslist()
