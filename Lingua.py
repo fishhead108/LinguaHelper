@@ -2,10 +2,11 @@ __author__ = 'FishHead'
 # -*- coding: utf-8 -*-
 import requests
 import sys
+from re import findall
 
 reload(sys)
 sys.setdefaultencoding("utf8")
-
+words = ('test','run')
 
 class Variables():
     """
@@ -18,7 +19,8 @@ class Variables():
         self.r = ''
         self.cookie = {}
         self.w = ''
-        self.words = ()
+        self.words = ('test', 'run')
+        self.definition = ''
 
 
 def start():
@@ -60,6 +62,13 @@ def ask_leo(word):
     return make_word(hit.text)
 
 
+def get_definition(word):
+    url = "http://dictionary.reference.com/browse/" + word
+    test = requests.get(url)
+    Variables.definition = (findall('<meta name="description" content=(.*?).>', test.text)[0]).replace('See more.','')
+    return
+
+
 def make_word(so):
     """
     Getting definitions of the word.
@@ -70,6 +79,7 @@ def make_word(so):
     sound = (((so.encode('ascii', 'replace')).split(',')[-1]).split('"')[3]).replace('\\', '')
     download_file(sound)
     download_file(picture)
+    get_definition(Variables.w)
     return save_files(Variables.w, transcription.split('"')[1], translation.split('"')[1], picture.split('/')[-1],
                       sound.split('/')[-1])
 
@@ -96,10 +106,16 @@ def instruction():
     """
     Writes instruction after installation.
     """
+    print '------' * 10
     print ('Чтобы произвести импорт карточек в Anki:\n'
            '1) Запустите Anki.\n'
            '2) В меню выберите Файл-Импортировать.\n'
            '3) В меню выберите файл который вы сохранили вначале.')
+
+def login_words_from_text():
+    cookie = {'login' : 'fishhead', 'password' : '6fvS1X4OUv1l', 'retpath' : 'http://wordsfromtext.com/about/'}
+    link = 'http://wordsfromtext.com/save/login/'
+    site = requests.post(url=link, cookies=cookie)
 
 
 def main():
@@ -108,10 +124,11 @@ def main():
     """
     start()
     login(Variables.mail, Variables.password)
-    create_wordslist()
+    #create_wordslist()
     for word in words:
         print word
         ask_leo(word)
+        print Variables.definition
     instruction()
 
 
