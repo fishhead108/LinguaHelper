@@ -2,11 +2,10 @@ __author__ = 'FishHead'
 # -*- coding: utf-8 -*-
 import requests
 import sys
-from re import findall
+from re import findall, sub
 
 reload(sys)
 sys.setdefaultencoding("utf8")
-words = ('test','run')
 
 class Variables():
     """
@@ -19,11 +18,14 @@ class Variables():
         self.r = ''
         self.cookie = {}
         self.w = ''
-        self.words = ('test', 'run')
-        self.definition = ''
+        self.words = ()
+        self.example = ''
 
 
 def start():
+    """
+    Introduction.
+    """
     Variables.mail = raw_input('Введите логин от сайта:\n')
     Variables.password = raw_input('Введите пароль:\n')
     Variables.filename = raw_input('Введите имя файла для выгрузки в Anki(включая расширение .txt):\n')
@@ -62,26 +64,27 @@ def ask_leo(word):
     return make_word(hit.text)
 
 
-def get_definition(word):
-    url = "http://dictionary.reference.com/browse/" + word
-    test = requests.get(url)
-    Variables.definition = (findall('<meta name="description" content=(.*?).>', test.text)[0]).replace('See more.','')
-    return
+def get_example(word):
+    """
+    Getting example for the word.
+    """
+    url = "http://www.oxforddictionaries.com/definition/english/" + word
+    page = requests.get(url)
+    raw = findall('<em class="example">(.*?)</em>', page.text)[0]
+    Variables.example = sub('<[^<]+?>', '', raw)
+    return Variables.example
+
 
 
 def make_word(so):
-    """
-    Getting definitions of the word.
-    """
     transcription = ((so.split(',')[-4]).split(':')[1]).encode('utf-8')
     translation = (so.split(',')[7]).split(":")[1]
     picture = (((so.encode('ascii', 'replace')).split(',')[5]).split('"')[3]).replace('\\', '')
     sound = (((so.encode('ascii', 'replace')).split(',')[-1]).split('"')[3]).replace('\\', '')
     download_file(sound)
     download_file(picture)
-    get_definition(Variables.w)
     return save_files(Variables.w, transcription.split('"')[1], translation.split('"')[1], picture.split('/')[-1],
-                      sound.split('/')[-1])
+                      sound.split('/')[-1], get_example(Variables.w))
 
 
 def download_file(file):
@@ -93,13 +96,13 @@ def download_file(file):
         code.write(Variables.r.content)
 
 
-def save_files(word, transcription, translation, picture, sound):
+def save_files(word, transcription, translation, picture, sound, defenition):
     """
     Saving values into file for next import to Anki.
     """
     with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\' + Variables.filename + '.txt', 'a') as handle:
         handle.write(
-            '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']')
+            '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']' + '\t' + '[def: ' + defenition + ' ]')
 
 
 def instruction():
@@ -124,11 +127,9 @@ def main():
     """
     start()
     login(Variables.mail, Variables.password)
-    #create_wordslist()
+    create_wordslist()
     for word in words:
-        print word
         ask_leo(word)
-        print Variables.definition
     instruction()
 
 
