@@ -77,6 +77,9 @@ def get_example(word):
 
 
 def make_word(so):
+    """
+    Assemble the word.
+    """
     transcription = ((so.split(',')[-4]).split(':')[1]).encode('utf-8')
     translation = (so.split(',')[7]).split(":")[1]
     picture = (((so.encode('ascii', 'replace')).split(',')[5]).split('"')[3]).replace('\\', '')
