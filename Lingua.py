@@ -58,7 +58,10 @@ def ask_leo(word):
     """
     Do the query to LinguaLeo with chosen word and return value to function make_word.
     """
-    link = 'http://api.lingualeo.com/gettranslates?word=' + word
+    if ' ' in word:
+        link = 'http://api.lingualeo.com/gettranslates?word=' + (word.split(' '))[0] + '%20' + (word.split(' '))[1]
+    else:
+        link = 'http://api.lingualeo.com/gettranslates?word=' + word
     hit = requests.get(url=link, cookies=Variables.cookie)
     Variables.w = word
     return make_word(hit.text)
@@ -68,9 +71,12 @@ def get_example(word):
     """
     Getting example for the word.
     """
-    url = "http://www.oxforddictionaries.com/definition/english/" + word
+    url = "http://www.oxforddictionaries.com/search/all/?direct=1&multi=1&q=" + word
     page = requests.get(url)
-    raw = findall('<em class="example">(.*?)</em>', page.text)[0]
+    if findall('<em class="example">(.*?)</em>', page.text) == []:
+        raw = findall('<li class="sentence">(.*?)</li>', page.text)[0]
+    else:
+        raw = findall('<em class="example">(.*?)</li>', page.text)[0]
     Variables.example = sub('<[^<]+?>', '', raw)
     return Variables.example
 
@@ -105,7 +111,7 @@ def save_files(word, transcription, translation, picture, sound, defenition):
     """
     with open('C:\\Users\\Dmitriy\\Documents\\Anki\\fish\\' + Variables.filename + '.txt', 'a') as handle:
         handle.write(
-            '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']' + '\t' + '[def: ' + defenition + ' ]')
+            '\n' + word + '\t' + transcription + '\t' + translation + '\t' + '<img src="' + picture + '">' + '\t' + '[sound:' + sound + ']' + '\t' + defenition)
 
 
 def instruction():
@@ -119,9 +125,11 @@ def instruction():
            '3) В меню выберите файл который вы сохранили вначале.')
 
 def login_words_from_text():
-    cookie = {'login' : 'fishhead', 'password' : '6fvS1X4OUv1l', 'retpath' : 'http://wordsfromtext.com/about/'}
+    cookie = {'login': 'fishhead', 'password': '6fvS1X4OUv1l'}
     link = 'http://wordsfromtext.com/save/login/'
-    site = requests.post(url=link, cookies=cookie)
+    header = {'POST': '/save/login/ HTTP/1.1', 'User-Agent': 'Mozilla/5.0', 'Content-Type': 'multipart/form-data',
+              'Referer': 'http://wordsfromtext.com/login/'}
+    site = requests.post(url=link, cookies=cookie, headers=header)
 
 
 def main():
