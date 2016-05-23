@@ -125,7 +125,7 @@ def instruction():
            '3) В меню выберите файл который вы сохранили вначале.')
 
 def login_words_from_text():
-    cookie = {'login': 'fishhead', 'password': '6fvS1X4OUv1l'}
+    cookie = {'login': 'fishhead', 'password': 'pass'}
     link = 'http://wordsfromtext.com/save/login/'
     header = {'POST': '/save/login/ HTTP/1.1', 'User-Agent': 'Mozilla/5.0', 'Content-Type': 'multipart/form-data',
               'Referer': 'http://wordsfromtext.com/login/'}
